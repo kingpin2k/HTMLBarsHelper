@@ -1,0 +1,57 @@
+﻿@using HTMLBarsHelper;
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    @Scripts.Render("~/bundles/jquery")
+    @Styles.Render("~/bundles/styles")
+    @Scripts.Render("~/bundles/app")
+    
+
+    @if (ViewBag.Debug)
+    {
+        @HTMLBarsHelper.RawTemplateInjector.InjectRawTemplates("~/Scripts/templates",
+                                                          new[] { "*.hbs" });
+    }
+    else
+    {
+        @Scripts.Render("~/bundles/templates")
+    }
+</head>
+<body>    
+
+    <h1>
+        Optimized Templates
+    </h1>
+    <h3>
+        Bundler:
+    </h3>
+    <h4>
+        bundles.Add(new Bundle("~/bundles/templates", new HandlebarsTransformer())<br />
+        .IncludeDirectory("~/Scripts/templates", "*.hbs", true));<br />
+    </h4>
+
+    <h3>
+        Page:
+    </h3>
+    <h4>
+        @@Scripts.Render("~/bundles/templates")
+    </h4>
+
+
+    <h1>
+        Unoptimized Templates
+    </h1>
+    <h3>
+        Page:
+    </h3>
+    <h4>
+        @@HTMLBarsHelper.RawTemplateInjector.InjectRawTemplates("~/scripts/templates", new[] { "*.hbs" })
+    </h4>
+
+    
+    @RenderBody()
+</body>
+</html>
