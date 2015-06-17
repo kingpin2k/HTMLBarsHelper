@@ -6,6 +6,6 @@ App.Router.map(function () {
 
 App.ColorsRoute = Em.Route.extend({
     model: function () {
-        return ['red', 'yellow', 'blue'];
+        return { colors: ['red', 'yellow', 'blue'] };
     }
 });
