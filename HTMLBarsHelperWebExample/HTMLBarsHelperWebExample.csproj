@@ -206,8 +206,6 @@
     <Content Include="Scripts\ember.debug.js" />
     <Content Include="Scripts\ember.prod.js" />
     <Content Include="Scripts\jquery-2.0.3.js" />
-    <Content Include="Scripts\templates\colors\index.hbs" />
-    <Content Include="Scripts\templates\new_lines.hbs" />
     <None Include="Scripts\templates\colors\colors.hbs" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">

@@ -1,11 +1,13 @@
 App = Em.Application.create();
 
 App.Router.map(function () {
-    this.resource('colors', function () { });
+    this.route('colors');
 });
 
 App.ColorsRoute = Em.Route.extend({
     model: function () {
-        return { colors: ['red', 'yellow', 'blue'] };
+        return ['red', 'yellow', 'blue'];
     }
 });
+
+App.ColorsController = Em.Controller.extend();
