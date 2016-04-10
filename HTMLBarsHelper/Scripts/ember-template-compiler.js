@@ -5,7 +5,7 @@
  *            Portions Copyright 2008-2011 Apple Inc. All rights reserved.
  * @license   Licensed under MIT license
  *            See https://raw.github.com/emberjs/ember.js/master/LICENSE
- * @version   2.0.0
+ * @version   2.0.3
  */
 
 (function() {
@@ -2323,7 +2323,7 @@ enifed('ember-metal/chains', ['exports', 'ember-metal/core', 'ember-metal/proper
   }
 
   function isVolatile(obj) {
-    return !(isObject(obj) && obj.isDescriptor && !obj._volatile);
+    return !(isObject(obj) && obj.isDescriptor && obj._volatile === false);
   }
 
   function Chains() {}
@@ -4059,7 +4059,7 @@ enifed('ember-metal/core', ['exports'], function (exports) {
   
     @class Ember
     @static
-    @version 2.0.0
+    @version 2.0.3
     @public
   */
 
@@ -4093,11 +4093,11 @@ enifed('ember-metal/core', ['exports'], function (exports) {
   
     @property VERSION
     @type String
-    @default '2.0.0'
+    @default '2.0.3'
     @static
     @public
   */
-  Ember.VERSION = '2.0.0';
+  Ember.VERSION = '2.0.3';
 
   /**
     The hash of environment variables used to control various configuration
@@ -4383,6 +4383,29 @@ enifed('ember-metal/dictionary', ['exports'], function (exports) {
     delete dict['_dict'];
     return dict;
   }
+});
+enifed("ember-metal/empty_object", ["exports"], function (exports) {
+  // This exists because `Object.create(null)` is absurdly slow compared
+  // to `new EmptyObject()`. In either case, you want a null prototype
+  // when you're treating the object instances as arbitrary dictionaries
+  // and don't want your keys colliding with build-in methods on the
+  // default object prototype.
+
+  "use strict";
+
+  var proto = Object.create(null, {
+    // without this, we will always still end up with (new
+    // EmptyObject()).constructor === Object
+    constructor: {
+      value: undefined,
+      enumerable: false,
+      writable: true
+    }
+  });
+
+  function EmptyObject() {}
+  EmptyObject.prototype = proto;
+  exports.default = EmptyObject;
 });
 enifed('ember-metal/environment', ['exports', 'ember-metal/core'], function (exports, _emberMetalCore) {
   'use strict';
@@ -7176,7 +7199,7 @@ enifed('ember-metal/mixin', ['exports', 'ember-metal/core', 'ember-metal/merge',
     @method aliasMethod
     @for Ember
     @param {String} methodName name of the method to alias
-    @private
+    @public
   */
 
   function aliasMethod(methodName) {
@@ -9988,7 +10011,7 @@ enifed('ember-metal/streams/utils', ['exports', 'ember-metal/core', './stream'],
       });
 
       for (i = 0, l = array.length; i < l; i++) {
-        subscribe(array[i], stream.notify, stream);
+        stream.addDependency(array[i]);
       }
 
       // used by angle bracket components to detect an attribute was provided
@@ -12015,7 +12038,7 @@ enifed('ember-template-compiler/system/compile_options', ['exports', 'ember-meta
 
     options.buildMeta = function buildMeta(program) {
       return {
-        revision: 'Ember@2.0.0',
+        revision: 'Ember@2.0.3',
         loc: program.loc,
         moduleName: options.moduleName
       };
@@ -18432,7 +18455,12 @@ enifed("htmlbars-util/morph-utils", ["exports"], function (exports) {
           current = current.nextMorph;
         }
       } else if (node.morphList) {
-        nodes.push(node.morphList);
+        var current = node.morphList.firstChildMorph;
+
+        while (current) {
+          nodes.push(current);
+          current = current.nextMorph;
+        }
       }
     }
   }
@@ -18871,8 +18899,8 @@ enifed('morph-range', ['exports', './morph-range/utils'], function (exports, _mo
           return this.setNode(content);
         }
         /* Handlebars.SafeString */
-        if (typeof content.string === 'string') {
-          return this.setHTML(content.string);
+        if (typeof content.toHTML === 'function') {
+          return this.setHTML(content.toHTML());
         }
         if (this.parseTextAsHTML) {
           return this.setHTML(content.toString());

@@ -46,9 +46,17 @@ namespace HTMLBarsHelper
                 javascript.AppendFormat("Ember.TEMPLATES['{0}']=", templateName);
                 javascript.AppendFormat("Ember.HTMLBars.template({0});", templates[templateName]);
             }
+            string compressed;
 
             var Compressor = new JavaScriptCompressor();
-            var compressed = Compressor.Compress(javascript.ToString());
+
+            try {
+                compressed = Compressor.Compress(javascript.ToString());
+            }
+            catch(Exception ex)
+            {
+                compressed = "/* failed to compile: " + ex.Message.Replace('/', '-') + " */ \n"  + javascript; ;
+            }
 
             response.ContentType = "text/javascript";
             response.Cacheability = HttpCacheability.Public;
