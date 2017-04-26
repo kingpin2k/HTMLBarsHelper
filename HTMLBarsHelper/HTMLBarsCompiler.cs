@@ -20,6 +20,7 @@ namespace HTMLBarsHelper
             var ass = typeof(HTMLBarsCompiler).Assembly;
             Engine.Execute("var exports = {};");
             Engine.Execute("var module = {};");
+            Engine.Execute("module.exports = {};");
             Engine.Execute("var global = this;");
             Engine.Execute(GetEmbeddedResource("HTMLBarsHelper.Scripts.ember-template-compiler.js", ass));
             Engine.Execute("var precompile = module.exports.precompile;");
